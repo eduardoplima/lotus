@@ -216,3 +216,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Lotus ---
+# IB Gateway installer (300 MB) — never commit; download locally.
+*.dmg
+# nautilus_trader ParquetDataCatalog + any local data lake.
+/data/
+/catalog/
+# Frontend build output (regenerated).
+frontend/dist/
+# Node
+node_modules/

@@ -1,0 +1,30 @@
+# Local infrastructure for Lotus.
+# Postgres is bound to localhost ONLY (§15) — never expose it to the network.
+#
+# TimescaleDB is a worthwhile optional extension for the bar/snapshot/result
+# time-series (hypertables, compression). It is *proposed, not imposed* (§3):
+# to use it, swap the image below for `timescale/timescaledb:2-pg16` and create
+# the extension in a migration. The plain `postgres:16` image is the default.
+
+services:
+  postgres:
+    image: postgres:16
+    # image: timescale/timescaledb:2-pg16   # optional, see note above
+    container_name: lotus-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lotus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lotus}
+      POSTGRES_DB: ${POSTGRES_DB:-lotus}
+    ports:
+      # Host port is overridable (POSTGRES_PORT) for hosts where 5432 is taken.
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - lotus_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lotus} -d ${POSTGRES_DB:-lotus}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  lotus_pgdata:
