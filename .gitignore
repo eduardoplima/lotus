@@ -227,3 +227,5 @@ __marimo__/
 frontend/dist/
 # Node
 node_modules/
+# Design briefs / archives at repo root stay out of the repo.
+/*.zip

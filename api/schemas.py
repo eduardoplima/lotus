@@ -39,6 +39,16 @@ class OhlcBarOut(BaseModel):
     vintage: str
 
 
+class FundingRateOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    ts: datetime
+    rate: float
+    premium: float | None = None
+    source: str
+    vintage: str
+
+
 class HypothesisOut(BaseModel):
     """A pre-registered hypothesis or a cemetery (killed) entry (§7.1/§7.2)."""
 

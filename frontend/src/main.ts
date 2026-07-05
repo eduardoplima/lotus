@@ -1,41 +1,75 @@
-// M0 entry: render one daily-candle tile for a single instrument.
+// LOTUS SPA — hash router + persistent chrome (header, gate pill, footer).
 
-import { fetchBars } from "./api";
-import { createCandleTile, setCandleData } from "./chart";
+import "./app.css";
+import { renderHome } from "./views/home";
+import { renderInstruments } from "./views/instruments";
+import { renderPortfolio } from "./views/portfolio";
+import { renderStrategies } from "./views/strategies";
+import { renderStrategyDetail } from "./views/strategy_detail";
 
-const SYMBOL = "SPY";
+const app = document.getElementById("app")!;
 
-function buildTile(symbol: string): { chartEl: HTMLElement; statusEl: HTMLElement } {
-  const grid = document.getElementById("grid")!;
-  const tile = document.createElement("section");
-  tile.className = "tile";
+const NAV = [
+  { label: "Home", route: "#/" },
+  { label: "Portfolio", route: "#/dashboard/portfolio" },
+  { label: "Instruments", route: "#/dashboard/instruments" },
+  { label: "Strategies", route: "#/dashboard/strategies" },
+];
 
-  const status = document.createElement("div");
-  status.className = "status";
-  status.textContent = `${symbol} — loading…`;
+function chrome(): { main: HTMLElement } {
+  app.innerHTML = `
+    <header class="lo-header">
+      <a class="lo-brand" href="#/">
+        <img src="/lotus-mark.svg" alt="" />
+        <span>LOTUS</span>
+      </a>
+      <nav class="lo-nav" id="nav"></nav>
+      <a class="lo-gate" href="#/dashboard/strategies/gate-replication" style="text-decoration:none;">
+        <span class="lo-gate__dot"></span>GATE REPLICATION · RED
+      </a>
+    </header>
+    <main id="main"></main>
+    <footer class="lo-footer">
+      <span>
+        Research platform. Not investment advice; not an offer or solicitation.
+        Figures are research output net of modeled costs; no performance is promised.
+      </span>
+      <span class="stamp" id="stamp">lotus-platform</span>
+    </footer>`;
 
-  const chartEl = document.createElement("div");
-  chartEl.className = "chart";
-
-  tile.append(status, chartEl);
-  grid.append(tile);
-  return { chartEl, statusEl: status };
+  const nav = app.querySelector<HTMLElement>("#nav")!;
+  const hash = window.location.hash || "#/";
+  for (const item of NAV) {
+    const a = document.createElement("a");
+    a.href = item.route;
+    a.textContent = item.label;
+    const active =
+      item.route === "#/"
+        ? hash === "#/" || hash === ""
+        : hash.startsWith(item.route);
+    a.classList.toggle("active", active);
+    nav.appendChild(a);
+  }
+  const stamp = app.querySelector<HTMLElement>("#stamp")!;
+  stamp.textContent = `lotus-platform · generated ${new Date().toISOString().slice(0, 19)} UTC`;
+  return { main: app.querySelector<HTMLElement>("#main")! };
 }
 
-async function main(): Promise<void> {
-  const { chartEl, statusEl } = buildTile(SYMBOL);
-  const chart = createCandleTile(chartEl);
+async function route(): Promise<void> {
+  const { main } = chrome();
+  const hash = window.location.hash || "#/";
+
+  const detail = hash.match(/^#\/dashboard\/strategies\/(.+)$/);
   try {
-    const bars = await fetchBars(SYMBOL, "1d");
-    if (bars.length === 0) {
-      statusEl.textContent = `${SYMBOL} — no bars stored yet. Run: python -m backend.cli ingest ${SYMBOL}`;
-      return;
-    }
-    setCandleData(chart, bars);
-    statusEl.textContent = `${SYMBOL} — ${bars.length} daily bars (source: ${bars[0].source})`;
+    if (detail) await renderStrategyDetail(main, detail[1]);
+    else if (hash.startsWith("#/dashboard/instruments")) await renderInstruments(main);
+    else if (hash.startsWith("#/dashboard/strategies")) await renderStrategies(main);
+    else if (hash.startsWith("#/dashboard/portfolio")) renderPortfolio(main);
+    else await renderHome(main);
   } catch (err) {
-    statusEl.textContent = `${SYMBOL} — error: ${(err as Error).message}`;
+    main.innerHTML = `<div class="lo-page lo-page--dash"><p>Failed to render: ${String(err)}</p></div>`;
   }
 }
 
-void main();
+window.addEventListener("hashchange", () => void route());
+void route();

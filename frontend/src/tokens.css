@@ -1,0 +1,110 @@
+/* ============================================================
+   LOTUS — Design Tokens
+   Quantitative research & data platform. Iris + warm-light identity.
+   Drop these custom properties on :root (or a theme wrapper) and
+   reference them everywhere. Values are the single source of truth
+   used by the HTML reference prototypes.
+   ============================================================ */
+
+:root {
+  /* ---- Color: neutrals (warm light ground) ---- */
+  --lo-bg:        #f2efe7;  /* app background */
+  --lo-bg-2:      #eae7de;  /* footer / recessed bands */
+  --lo-panel:     #faf8f2;  /* cards, tables, primary surfaces */
+  --lo-panel-2:   #f0ede4;  /* nested surfaces */
+  --lo-line:      #dcd8cd;  /* hairline borders, table rules */
+  --lo-line-2:    #cbc6b9;  /* stronger borders, chip outlines */
+
+  /* ---- Color: ink ---- */
+  --lo-text:      #1c1e24;  /* primary text */
+  --lo-dim:       #6a6c66;  /* secondary text */
+  --lo-faint:     #9a988e;  /* labels, captions, meta */
+
+  /* ---- Color: brand accent (the ONLY decorative color) ---- */
+  --lo-accent:      #6d55c9;               /* iris */
+  --lo-accent-soft: rgba(109,85,201,0.12); /* accent wash / active chip fill */
+
+  /* ---- Color: SEMANTIC — reserved, never decorative ---- */
+  /* Use ONLY for P&L sign and replication-gate status. */
+  --lo-pos:    #3f8f5e;  /* positive P&L, gate green */
+  --lo-neg:    #c24a41;  /* negative P&L, gate RED */
+  --lo-killed: #8a8c86;  /* killed / cemetery state (muted, not red) */
+
+  /* ---- Dark chrome (for app icon / reversed lockups) ---- */
+  --lo-graphite: #191d24;
+  --lo-bone:     #efece3;
+
+  /* ---- Typography ---- */
+  --lo-font-display: 'Space Mono', monospace;      /* manifesto, headings, wordmark */
+  --lo-font-ui:      'Space Grotesk', sans-serif;  /* body, UI, buttons */
+  --lo-font-mono:    'JetBrains Mono', monospace;  /* ALL numerals, code, hashes, timestamps */
+
+  /* Numeric tables MUST use tabular lining figures: */
+  /* font-variant-numeric: tabular-nums lining-nums; */
+
+  /* ---- Type scale (clamp = fluid; px = fixed) ---- */
+  --lo-fs-hero:   clamp(38px, 6.4vw, 86px);  /* home hero H1 */
+  --lo-fs-h2:     clamp(24px, 3vw, 34px);    /* section titles */
+  --lo-fs-h3:     19px;                       /* card / pillar titles */
+  --lo-fs-body:   15px;                       /* base */
+  --lo-fs-lead:   clamp(16px, 1.9vw, 20px);  /* lead paragraph */
+  --lo-fs-mono:   12.5px;                     /* table / data mono */
+  --lo-fs-label:  11px;                       /* uppercase meta labels */
+  --lo-fs-micro:  10px;                       /* table headers, ticks */
+  --lo-lh-tight:  1.1;
+  --lo-lh-body:   1.6;
+  --lo-tracking-label: 0.08em;   /* uppercase mono labels */
+  --lo-tracking-wordmark: 0.24em;
+
+  /* ---- Spacing / layout ---- */
+  --lo-maxw-editorial: 1180px;   /* home */
+  --lo-maxw-dash:      1360px;   /* dashboards */
+  --lo-maxw-detail:    1080px;   /* strategy detail */
+  --lo-header-h:       60px;
+  --lo-pad-page:       clamp(20px, 4vw, 56px);
+
+  /* ---- Radius / borders ---- */
+  --lo-radius:      2px;   /* default — deliberately sharp/terminal */
+  --lo-radius-icon: 22px;  /* app icon squircle */
+  --lo-border:      1px solid var(--lo-line);
+
+  /* ---- Motion ---- */
+  --lo-ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --lo-dur:  160ms;
+}
+
+/* ============================================================
+   Utility patterns worth codifying (optional helpers)
+   ============================================================ */
+
+/* Cemetery / killed surface — dignified cross-hatch, never red. */
+.lo-hatch {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--lo-panel), var(--lo-panel) 7px,
+    rgba(0,0,0,0.05) 7px, rgba(0,0,0,0.05) 14px
+  );
+}
+
+/* Every numeric table cell. */
+.lo-tabular { font-variant-numeric: tabular-nums lining-nums; font-family: var(--lo-font-mono); }
+
+/* Provenance chip: source · vintage · config_hash */
+.lo-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--lo-font-mono); font-size: var(--lo-fs-label);
+  color: var(--lo-faint);
+  border: 1px solid var(--lo-line); border-radius: var(--lo-radius);
+  padding: 5px 10px;
+}
+
+/* Replication-gate pill (RED example). Swap --lo-neg → --lo-pos when green. */
+.lo-gate {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--lo-font-mono); font-size: var(--lo-fs-label);
+  color: var(--lo-neg);
+  background: rgba(194,74,65,0.06);
+  border: 1px solid rgba(194,74,65,0.35); border-radius: var(--lo-radius);
+  padding: 6px 10px; letter-spacing: 0.04em;
+}
+.lo-gate__dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
